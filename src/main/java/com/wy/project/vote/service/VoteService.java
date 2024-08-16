@@ -32,6 +32,15 @@ public class VoteService {
      * @return Result
      */
     public Result save(SaveVoteItemRequest request) {
+        if ("".equals(request.getName())) {
+            return Result.builder().code("NG")
+                    .message("請輸入項目名稱").build();
+        }
+        if (request.getName().length() > 50) {
+            return Result.builder().code("NG")
+                    .message("項目名稱最多50字").build();
+        }
+
         VoteItem voteItem = new VoteItem();
         voteItem.setId(request.getId());
         voteItem.setName(request.getName());
@@ -40,7 +49,7 @@ public class VoteService {
         try {
             object = voteItemRepository.saveVoteItem(voteItem);
         } catch (Exception e) {
-        	return Result.builder().code("NG").message("儲存失敗").build();
+            return Result.builder().code("NG").message("儲存失敗").build();
         }
         return Result.builder().code("OK").message("成功").data(object).build();
     }
@@ -65,7 +74,20 @@ public class VoteService {
      * @return Result
      */
     public Result vote(VoteRequest request) {
-    	Integer code = 0;
+        if (request.getItemIds().isEmpty()) {
+            return Result.builder().code("NG")
+                    .message("請至少選擇一個項目").build();
+        }
+        if ("".equals(request.getVoterName())) {
+            return Result.builder().code("NG")
+                    .message("請輸入投票人名稱").build();
+        }
+        if (request.getVoterName().length() > 50) {
+            return Result.builder().code("NG")
+                    .message("投票人名稱最多50字").build();
+        }
+
+        Integer code = 0;
         try {
             code = voteItemRepository.saveVoteAndUpdateCount(request.getItemIds(), request.getVoterName());
         } catch (Exception e) {
@@ -76,4 +98,5 @@ public class VoteService {
         }
         return Result.builder().code("OK").message("成功").build();
     }
+
 }
