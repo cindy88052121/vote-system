@@ -1,0 +1,24 @@
+CREATE PROCEDURE `VOTE_DB`.`SAVE_VOTE_ITEM`(
+	IN v_id INT,
+    IN v_name VARCHAR(50)
+)
+BEGIN
+	DECLARE new_id INT;
+
+    IF v_id IS NULL THEN
+        -- 新增
+        INSERT INTO VOTE_ITEM (NAME) VALUES (v_name);
+        SET new_id = LAST_INSERT_ID();
+    ELSE
+        -- 修改
+        UPDATE VOTE_ITEM
+        SET NAME = v_name
+        WHERE ID = v_id;
+
+        SET new_id = v_id;
+    END IF;
+   
+    SELECT ID, NAME, VOTE_COUNT
+    FROM VOTE_ITEM
+    WHERE ID = new_id;
+END

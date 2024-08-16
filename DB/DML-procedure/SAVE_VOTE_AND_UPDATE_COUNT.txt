@@ -1,0 +1,42 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `VOTE_DB`.`SAVE_VOTE_AND_UPDATE_COUNT`(
+	IN v_itemIds JSON,
+	IN v_voterName VARCHAR(50),
+	OUT v_code INT
+)
+BEGIN
+    DECLARE i INT DEFAULT 0;
+    DECLARE v_count INT;
+    DECLARE v_itemId INT;
+    DECLARE v_len INT;
+    DECLARE exit handler for SQLEXCEPTION 
+    BEGIN
+        ROLLBACK;
+        SET v_code = 0;
+    END;
+
+    -- 開始交易
+    START TRANSACTION;
+
+    SET v_len = JSON_LENGTH(v_itemIds);
+
+    WHILE i < v_len DO
+        -- 提取每個投票記錄
+		SET v_itemId = CAST(JSON_UNQUOTE(JSON_EXTRACT(v_itemIds, CONCAT('$[', i, ']'))) AS UNSIGNED);
+
+        -- 新增投票記錄
+        INSERT INTO VOTE_RECORD (VOTER_NAME, VOTE_ITEM_ID)
+        VALUES (v_voterName, v_itemId);
+        
+        -- 修改投票計數
+        UPDATE VOTE_ITEM
+        SET VOTE_COUNT = VOTE_COUNT + 1
+        WHERE ID = v_itemId;
+        
+        -- 至下一條記錄
+        SET i = i + 1;
+    END WHILE;
+   
+    -- 提交交易
+    COMMIT;
+    SET v_code = 1;
+END
