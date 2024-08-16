@@ -13,8 +13,8 @@ import com.wy.project.vote.bean.SaveVoteItemRequest;
 import com.wy.project.vote.bean.VoteRequest;
 import com.wy.project.vote.service.VoteService;
 
-@RestController
 @CrossOrigin
+@RestController
 public class VoteController {
 
     @Autowired
@@ -33,10 +33,9 @@ public class VoteController {
      * 新增-投票項目
      * @param request
      * @return Result
-     * @throws JsonProcessingException
      */
     @RequestMapping(value = "/voteItems", method = RequestMethod.POST)
-    public Result insert(@RequestBody SaveVoteItemRequest request) throws JsonProcessingException {
+    public Result insert(@RequestBody SaveVoteItemRequest request) {
         return voteService.save(request);
     }
 
@@ -54,10 +53,9 @@ public class VoteController {
      * 投票
      * @param request
      * @return Result
-     * @throws JsonProcessingException
      */
     @RequestMapping(value = "/voteItems/vote", method = RequestMethod.POST)
-    public Result vote(@RequestBody VoteRequest request) throws JsonProcessingException {
+    public Result vote(@RequestBody VoteRequest request) {
         return voteService.vote(request);
     }
 }
